@@ -1,5 +1,4 @@
 **TDECQ** (Transmitter and Dispersion Eye Closure Quaternary) 是 PAM4 信号测试中**最重要、最核心**的指标，没有之一。
-
 如果把 PAM4 测试比作“体检”，那么 TDECQ 就是那个决定你是否健康的“综合评分”。在传统的 NRZ（二进制）时代，我们看“眼图模板（Mask）”；但在 PAM4 时代，**眼图模板已经失效，TDECQ 成为了新的黄金标准**。
 
 ---
