@@ -1,0 +1,5 @@
+.DS_Store           # Mac 系统文件
+Thumbs.db           # Windows 缩略图
+*.log               # 日志文件
+node_modules/       # 如果用了 Node 相关工具
+.vscode/            # 除非你想同步编辑器设置，否则通常忽略
