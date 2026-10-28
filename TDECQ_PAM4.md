@@ -68,7 +68,7 @@ TDECQ 会出现在以下场景：
 2.  **Corner 测试（高低温/电压）**：
     *   在低温或低压下，晶体管性能下降，线性度变差，TDECQ 往往会恶化。您需要找到最差的 Corner 并确保它依然达标。
 3.  **互操作性测试 (Interoperability)**：
-    *   海思的芯片要对接不同厂家（如 Coherent, Lumentum, Inphi）的光模块。TDECQ 是双方公认的“通行证”。只要 TDECQ 达标，理论上就能互通。
+    *   芯片要对接不同厂家（如 Coherent, Lumentum, Inphi）的光模块。TDECQ 是双方公认的“通行证”。只要 TDECQ 达标，理论上就能互通。
 4.  **LPO/CPO 新技术**：
     *   在 LPO（线性驱动可插拔光学）方案中，因为去掉了 DSP 芯片进行信号整形，对 Tx 的线性度要求极高，**TDECQ 的余量非常紧张**，是您测试的重中之重。
 
