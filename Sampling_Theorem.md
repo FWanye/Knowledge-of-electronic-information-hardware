@@ -144,5 +144,5 @@ $$\sigma_V \approx S \cdot \sigma_t$$
 
 ---
 
-> 相关笔记：[Crosstalk_measure.md](Crosstalk_measure.md)（串扰与 J3U 量化）、[Rate_Coding.md](Rate_Coding.md)（码元/波特率/PRBS 基础）、[TDECQ_PAM4.md](TDECQ_PAM4.md)（PAM4 发射机指标）
+> 相关笔记：[Crosstalk_measure.md](Crosstalk_measure.md)（串扰与 J3U 量化）、[Rate_Coding.md](Rate_Coding.md)（码元/波特率/PRBS 基础）、[TDECQ_PAM4.md](TDECQ_PAM4.md)（PAM4 发射机指标）、[Serdes_Eye_Jitter_EQ.md](Serdes_Eye_Jitter_EQ.md)（眼图、抖动与均衡）、[Filter_Basics.md](Filter_Basics.md)（滤波器基础与抗混叠）
 > 整理自 DeepSeek 对话：https://chat.deepseek.com/share/8h7s57s3tv9edcixgc （2026-10-29）
