@@ -72,6 +72,28 @@ $n$ 是与目标 BER 对应的 RJ 标准差倍数，$BER=10^{-12}$ 时约为 $14
 - **抖动频谱**：通过频率分量定位抖动源，例如怀疑 66 MHz 开关噪声，就检查该频点是否有峰值。
 - **RJ/DJ 分离算法**：dual-Dirac 模型把 DJ 表示为两个 δ 函数、RJ 表示为零均值高斯，TJ 的 PDF 是二者卷积；卷积结果“中间高斯、两端平坦”的形态差异，正是 RJ/DJ 分离的理论基础。
 
+**RJ / PJ / DJ / J3u：先分清“成因分类”与“合规指标”**（这条最容易混）
+
+- **RJ、DJ、PJ 是抖动的物理成因分类**：$TJ = RJ + DJ$ 是分解框架，DJ 内部再拆 PJ、DDJ（ISI）、DCD、BUJ（Bounded Uncorrelated Jitter，有界非相关抖动）。它们回答的是“抖动从哪来”。
+- **J3u 不是第四种抖动**，而是 PAM4 以太网（802.3cd / 802.3ck 一类）在 TX 合规里规定的**复合测试指标**——抖动累积分布（CDF）从 0.05% 到 99.95% 的跨度，也就是剔除两端合计 $10^{-3}$ 的极端样本后，覆盖 99.9% 抖动事件的时间窗口：
+
+$$J3u = t_j(99.95\%) - t_j(0.05\%)\ \approx\ A_{DD} + 6.6\,\sigma_{RJ}$$
+
+其中 6.6 来自 BER $10^{-3}$ 口径（两侧各 $5\times10^{-4}$，$2\times Q^{-1}(5\times10^{-4})\approx 6.58$）；只有 DJ 可忽略时才退化成 $J3u \approx 6.6\,J_{RMS}$。标准正是用 $(J3u,\ J_{RMS})$ 这一对数据反推有界部分 $A_{DD}$ 与随机部分的 $\sigma_{RJ}$；它回答的是“这颗 TX 合不合规”。
+
+| 概念 | 维度 | 本质 | 对眼图 / BER 的影响 | 能否用均衡补救 |
+| --- | --- | --- | --- | --- |
+| RJ | 成因 | 高斯、无界（热噪声、散粒噪声） | 低 BER 下 TJ 的主要贡献；$10^{-12}$ 处需外推约 14σ | 不能，靠降噪与时钟/电源设计 |
+| PJ | 成因 | 周期、有界（电源、时钟、串扰） | 频率敏感，落在 CDR 环路带宽或码率谐波附近会谐振恶化；只看时域峰峰值容易低估 | 不能，查抖动频谱找干扰源 |
+| DDJ / ISI（DJ 子项） | 成因 | 有界、码型相关（信道低通、反射） | 眼高与眼宽同时收窄，是眼图闭合的主因 | 能，TX FFE / RX CTLE / DFE |
+| DCD | 成因 | 有界，上升/下降沿不对称 | 交叉点偏移，有效眼宽减小 | 部分，修驱动与走线失配 |
+| BUJ | 成因 | 有界但与本通道数据不相关（串扰、电源耦合） | 以额外噪声/抖动叠加，J3u 对之敏感 | 不能，靠屏蔽、布线与串扰控制 |
+| J3u | **指标** | BER $10^{-3}$ 口径的 TJ 近似（CDF 0.05%–99.95%） | 合规判据，且对测量点的噪声与边沿斜率敏感 | —（它是度量，不是损伤） |
+
+**J3u 的测量陷阱**：J3u 与 $J_{RMS}$ 的测量值**高度受边沿的压摆率（slew rate）和测量点噪声影响**，IEEE 相关贡献文件明确指出它们“并不反映真实的非相关抖动”。原因在于 J3u 是用边沿穿越阈值的时间偏差统计出来的：边沿越慢，同样的垂直噪声就被换算成越大的时间抖动；反射还会造成波形不对称、直方图拖尾。所以**同一个 TX，在 TP1a 处合格、在 TP2 处超标**是可能出现的，测量点必须先对齐（见 [Serdes_TestPoint.md](Serdes_TestPoint.md)）。
+
+**读到 J3u 超标的诊断顺序**：① 先确认测试点、夹具去嵌、参考接收机与 CRU 配置是否与规范一致；② 用 $J_{RMS}$ 与双狄拉克分离判断 RJ、DJ 的占比；③ 看抖动频谱定位 PJ 的频点；④ 用码型相关性与 FFE 扫描判断 DDJ；⑤ 最后才归因到 TX 设计还是信道。**J3u 只是“不合规”的信号灯，它不告诉你病因。**
+
 **抖动与均衡的关系**：DDJ/ISI 是均衡器的主攻目标——降低传输线衰减，或使用合适的 TX 均衡与 RX 均衡，可有效降低 DDJ。而 PJ 属于相位噪声类问题，**均衡器救不了**，要从电源、参考时钟、屏蔽与走线间距入手。
 
 ---
@@ -182,8 +204,9 @@ FPGA 侧的对应选择也很实用：LPM（线性 EQ/CTLE）功耗比 DFE 模�
 
 ---
 
-> 相关笔记：[Serdes_PAM.md](Serdes_PAM.md)（PAM4 电平与三眼图）、[TDECQ_PAM4.md](TDECQ_PAM4.md)（PAM4 发射机指标）、[Crosstalk_measure.md](Crosstalk_measure.md)（串扰与 J3U 量化）、[Filter_Basics.md](Filter_Basics.md)（滤波器基础：低通/高通/带通与 FIR/IIR）、[Sampling_Theorem.md](Sampling_Theorem.md)（采样、混叠与抖动测量）
+> 相关笔记：[Serdes_PAM.md](Serdes_PAM.md)（PAM4 电平与三眼图）、[TDECQ_PAM4.md](TDECQ_PAM4.md)（PAM4 发射机指标）、[Crosstalk_measure.md](Crosstalk_measure.md)（串扰与 J3U 量化）、[Serdes_TestPoint.md](Serdes_TestPoint.md)（TP1a/TP2 测试点：测在哪儿决定读数怎么解读）、[Filter_Basics.md](Filter_Basics.md)（滤波器基础：低通/高通/带通与 FIR/IIR）、[Sampling_Theorem.md](Sampling_Theorem.md)（采样、混叠与抖动测量）
 > 整理自千问分享对话：https://qianwen.my.cn/share/chat/237a2ba41eb840d9ab181b74bc9b5064 （2026-10-30）
+> 第 3 节「J3u 与成因分类的区别」细化自 DeepSeek 分享对话：https://chat.deepseek.com/share/r1fhgfawdrp0rneedl （2026-11-02）
 
 ### 参考资料
 
@@ -193,3 +216,6 @@ FPGA 侧的对应选择也很实用：LPM（线性 EQ/CTLE）功耗比 DFE 模�
 - [Tektronix：高速的挑战——传输链路的损耗和均衡](https://www.tek.com.cn/news/what-you-need-to-know-about-high-speed-signals-to-make-a-signal-chain-3)
 - [AMD-Xilinx：FPGA 高速收发器的信号完整性简介](https://adaptivesupport.amd.com/s/article/000034699?language=zh_CN)
 - [预加重与均衡在高速 SerDes PCB 链路中的协同设计](https://www.jiepei.com/design/10164.html)
+- [IEEE 802.3dj D1p1 评论（J3u 复合值与压摆率/噪声敏感性的讨论）](https://grouper.ieee.org/groups/802/3/dj/comments/D1p1/8023dj_D1p1_comments_proposed_id.pdf)
+- [信号链芯片的眼图和抖动测试](https://www.xcc.com/news/detail/5565398)
+- [Keysight：抖动与眼图测量参考指南](https://www.keysight.com/ro/en/assets/9018-07500/reference-guides/9018-07500.pdf)
