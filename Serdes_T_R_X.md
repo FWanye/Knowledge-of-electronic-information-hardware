@@ -15,7 +15,8 @@
     *   **是什么**：PAM4 时代最重要的 TX 指标。它模拟了信号经过光纤传输后的眼图闭合程度。
     *   **为什么重要**：传统眼图高宽可能很好看，但 TDECQ 可能很差（因为噪声大或线性度差）。**TDECQ 超标 = 链路误码率高**。
     *   **您的工作**：调试示波器的 Reference Receiver 参数，分析 TDECQ 的贡献来源（是垂直噪声大？还是电平失配？）。
-*   **OMA (Optical Modulation Amplitude) / 电幅度**：
+*   **OMA (Optical Modulation Amplitude)光调制振幅 / 电幅度**：
+    *   两电平的功率差（\(P_1 - P_0\)）
     *   信号摆幅够不够大？太小信噪比低，太大可能削顶失真。
 *   **ER (Extinction Ratio, 消光比)**：
     *   如果是直接测光口，这是关键指标（“1”和“0”的光功率比值）。
@@ -98,5 +99,3 @@ RX 是验证的难点，因为它需要处理各种“脏”信号并恢复数�
 *   **不懂 TX/RX**：您是一个**测试操作员**（Test Operator），只能报 Pass/Fail。
 *   **精通 TX/RX**：您是一个**产品验证工程师**（Product Validation Engineer）甚至**系统架构师**，您能告诉设计团队：“把 CTLE 的第二级极点频率提高 10%，COM 值能提升 0.5dB。”
 
-**下一步行动**：
-明天上班，找到芯片的 **Register Map (寄存器地图)** 和 **Architecture Block Diagram (架构框图)**，对着框图上的 TX/RX 模块，去 Register Map 里找对应的控制位。这就是您入门的钥匙。
